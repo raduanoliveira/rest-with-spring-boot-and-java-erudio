@@ -5,10 +5,13 @@ import java.util.Objects;
 
 import org.springframework.hateoas.RepresentationModel;
 
+import com.github.dozermapper.core.Mapping;
+
 public class PersonVO extends RepresentationModel<PersonVO> implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 
+	@Mapping("id")
 	private Long key;
 	private String firstName;
 	private String lastName;
