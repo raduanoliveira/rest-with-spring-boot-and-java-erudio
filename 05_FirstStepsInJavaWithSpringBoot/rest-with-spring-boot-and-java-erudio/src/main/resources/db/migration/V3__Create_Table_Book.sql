@@ -1,4 +1,5 @@
-﻿CREATE TABLE `books` (
+﻿
+CREATE TABLE `book` (
   `id` INT(10) AUTO_INCREMENT PRIMARY KEY,
   `author` longtext,
   `launch_date` datetime(6) NOT NULL,
