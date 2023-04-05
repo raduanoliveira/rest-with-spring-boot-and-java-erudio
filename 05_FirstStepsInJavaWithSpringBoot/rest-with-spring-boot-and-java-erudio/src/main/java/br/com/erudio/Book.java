@@ -10,6 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
 @Entity
 @Table(name="book")
@@ -25,6 +27,7 @@ public class Book implements Serializable{
 	private String author;
 	
 	@Column(name = "launch_date", nullable = false)
+	@Temporal(TemporalType.DATE)
 	private Date launchDate;
 	
 	@Column(precision = 65, scale = 2, nullable = false)
