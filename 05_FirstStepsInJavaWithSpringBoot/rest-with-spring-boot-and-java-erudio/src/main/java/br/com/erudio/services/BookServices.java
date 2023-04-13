@@ -9,12 +9,12 @@ import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.com.erudio.Book;
 import br.com.erudio.controllers.BookController;
 import br.com.erudio.data.vo.v1.BookVO;
 import br.com.erudio.exceptions.RequiredObjectsIsNullException;
 import br.com.erudio.exceptions.ResourceNotFoundException;
 import br.com.erudio.mapper.DozerMapper;
+import br.com.erudio.model.Book;
 import br.com.erudio.repositories.BookRepository;
 
 @Service

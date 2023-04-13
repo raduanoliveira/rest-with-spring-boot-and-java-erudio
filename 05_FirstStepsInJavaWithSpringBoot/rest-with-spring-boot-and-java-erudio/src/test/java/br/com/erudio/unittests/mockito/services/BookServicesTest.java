@@ -17,11 +17,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import br.com.erudio.Book;
-import br.com.erudio.Person;
 import br.com.erudio.data.vo.v1.BookVO;
 import br.com.erudio.data.vo.v1.PersonVO;
 import br.com.erudio.exceptions.RequiredObjectsIsNullException;
+import br.com.erudio.model.Book;
+import br.com.erudio.model.Person;
 import br.com.erudio.repositories.BookRepository;
 import br.com.erudio.services.BookServices;
 import br.com.erudio.unittests.mapper.mocks.MockBook;
