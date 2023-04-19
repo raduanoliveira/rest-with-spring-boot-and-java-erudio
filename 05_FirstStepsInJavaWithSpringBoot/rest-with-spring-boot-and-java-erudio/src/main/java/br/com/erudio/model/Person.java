@@ -32,6 +32,9 @@ public class Person implements Serializable{
 	@Column
 	private String gender;
 	
+	@Column(nullable = false)
+	private Boolean enabled;
+	
 	public Person() {
 	}
 
@@ -58,23 +61,13 @@ public class Person implements Serializable{
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(address, firstName, gender, id, lastName);
+	
+	public Boolean getEnabled() {
+		return enabled;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Person other = (Person) obj;
-		return Objects.equals(address, other.address) && Objects.equals(firstName, other.firstName)
-				&& Objects.equals(gender, other.gender) && id == other.id && Objects.equals(lastName, other.lastName);
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	public String getAddress() {
@@ -92,6 +85,24 @@ public class Person implements Serializable{
 	public void setGender(String gender) {
 		this.gender = gender;
 	}
-	
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(address, enabled, firstName, gender, id, lastName);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Person other = (Person) obj;
+		return Objects.equals(address, other.address) && Objects.equals(enabled, other.enabled)
+				&& Objects.equals(firstName, other.firstName) && Objects.equals(gender, other.gender) && id == other.id
+				&& Objects.equals(lastName, other.lastName);
+	}
 	
 }
