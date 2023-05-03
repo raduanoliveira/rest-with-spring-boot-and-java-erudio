@@ -6,9 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -25,6 +22,7 @@ import br.com.erudio.integrationtests.controller.withYaml.mapper.YMLMapper;
 import br.com.erudio.integrationtests.testcontainer.AbstractIntegrationTest;
 import br.com.erudio.integrationtests.vo.AccountCredentialsVO;
 import br.com.erudio.integrationtests.vo.PersonVO;
+import br.com.erudio.integrationtests.vo.pagedmodels.PagedModelPerson;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.EncoderConfig;
 import io.restassured.config.RestAssuredConfig;
@@ -253,21 +251,22 @@ public class PersonControllerYamlTest extends AbstractIntegrationTest{
 	@Order(6)
 	public void testFindAll() throws JsonMappingException, JsonProcessingException {
 		
-		var content = given().spec(specification)
+		var wrapper = given().spec(specification)
 				.config(RestAssuredConfig.config().
 						encoderConfig(EncoderConfig.encoderConfig().
 								encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML, ContentType.TEXT)))
 				.contentType(TestConfigs.CONTENT_TYPE_YML)
 				.accept(TestConfigs.CONTENT_TYPE_YML)
 				.header(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
+				.queryParams("page",3,"size",10,"direction","asc")
 				.when()
 				.get()
 			.then()
 				.statusCode(200)
 			.extract()
-			.body().as(PersonVO[].class, objectMapper);
+			.body().as(PagedModelPerson.class, objectMapper);
 		
-		List<PersonVO> people = Arrays.asList(content);
+		var people = wrapper.getContent();
 		
 		PersonVO foundPersonOne = people.get(0);
 		
@@ -276,27 +275,27 @@ public class PersonControllerYamlTest extends AbstractIntegrationTest{
 		assertNotNull(foundPersonOne.getLastName());
 		assertNotNull(foundPersonOne.getAddress());
 		assertNotNull(foundPersonOne.getGender());
-		assertTrue(foundPersonOne.getEnabled());
-		assertEquals(3, foundPersonOne.getId());
+		assertEquals(673, foundPersonOne.getId());
 		
-		assertEquals("Leandro", foundPersonOne.getFirstName());
-		assertEquals("Almeida",foundPersonOne.getLastName());
-		assertEquals("Rua das Algarobas, 1000",foundPersonOne.getAddress());
-		assertEquals("Female",foundPersonOne.getGender());
+		assertEquals("Alic", foundPersonOne.getFirstName());
+		assertEquals("Terbrug",foundPersonOne.getLastName());
+		assertEquals("3 Eagle Crest Court",foundPersonOne.getAddress());
+		assertEquals("Male",foundPersonOne.getGender());
+		assertTrue(foundPersonOne.getEnabled());
 		
 		PersonVO foundPersonTwo = people.get(1);
-		
+		 
 		assertNotNull(foundPersonTwo.getId());
 		assertNotNull(foundPersonTwo.getFirstName());
 		assertNotNull(foundPersonTwo.getLastName());
 		assertNotNull(foundPersonTwo.getAddress());
 		assertNotNull(foundPersonTwo.getGender());
-		assertEquals(4, foundPersonTwo.getId());
-		assertTrue(foundPersonTwo.getEnabled());
+		assertEquals(410, foundPersonTwo.getId());
+		assertFalse(foundPersonTwo.getEnabled());
 		
-		assertEquals("Sabrina", foundPersonTwo.getFirstName());
-		assertEquals("Sato",foundPersonTwo.getLastName());
-		assertEquals("Rio de Janeiro",foundPersonTwo.getAddress());
+		assertEquals("Alie", foundPersonTwo.getFirstName());
+		assertEquals("Yeld",foundPersonTwo.getLastName());
+		assertEquals("42 Messerschmidt Crossing",foundPersonTwo.getAddress());
 		assertEquals("Female",foundPersonTwo.getGender());
 	}
 	
@@ -322,6 +321,80 @@ public class PersonControllerYamlTest extends AbstractIntegrationTest{
 				.get()
 			.then()
 				.statusCode(403);
+	}
+	
+	@Test
+	@Order(8)
+	public void testFindByName() throws JsonMappingException, JsonProcessingException {
+		
+		var wrapper = given().spec(specification)
+				.config(RestAssuredConfig.config().
+						encoderConfig(EncoderConfig.encoderConfig().
+								encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML, ContentType.TEXT)))
+			.contentType(TestConfigs.CONTENT_TYPE_YML)
+			.accept(TestConfigs.CONTENT_TYPE_YML)
+				.header(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
+				.pathParam("firstName", "lean")
+				.queryParams("page",0,"size",6,"direction","asc")
+				.when()
+				.get("findPersonsByName/{firstName}")
+			.then()
+				.statusCode(200)
+			.extract()
+			.body().as(PagedModelPerson.class, objectMapper);
+		
+		var people = wrapper.getContent();
+		
+		PersonVO foundPersonOne = people.get(0);
+		
+		assertNotNull(foundPersonOne.getId());
+		assertNotNull(foundPersonOne.getFirstName());
+		assertNotNull(foundPersonOne.getLastName());
+		assertNotNull(foundPersonOne.getAddress());
+		assertNotNull(foundPersonOne.getGender());
+		
+		assertEquals(3, foundPersonOne.getId());
+		assertEquals("Leandro", foundPersonOne.getFirstName());
+		assertEquals("Almeida",foundPersonOne.getLastName());
+		assertEquals("Rua das Algarobas, 1000",foundPersonOne.getAddress());
+		assertEquals("Female",foundPersonOne.getGender());
+		assertFalse(foundPersonOne.getEnabled());
+		
+	}
+	
+	@Test
+	@Order(9)
+	public void testHATEOAS() throws JsonMappingException, JsonProcessingException {
+		
+		var unthreatedContent = given().spec(specification)
+				.config(RestAssuredConfig.config().
+						encoderConfig(EncoderConfig.encoderConfig().
+								encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML, ContentType.TEXT)))
+				.contentType(TestConfigs.CONTENT_TYPE_YML)
+				.accept(TestConfigs.CONTENT_TYPE_YML)
+				.header(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
+				.queryParams("page",3,"size",10,"direction","asc")
+				.when()
+				.get()
+			.then()
+				.statusCode(200)
+			.extract()
+			.body().asString();
+		
+		var content = unthreatedContent.replace("\n", "").replace("\r", "");
+		
+		assertTrue(content.contains("rel: \"self\"    href: \"http://localhost:8888/api/person/v1/673\""));
+		assertTrue(content.contains("rel: \"self\"    href: \"http://localhost:8888/api/person/v1/410\""));
+		assertTrue(content.contains("rel: \"self\"    href: \"http://localhost:8888/api/person/v1/842\""));
+		
+		
+		assertTrue(content.contains("rel: \"first\"  href: \"http://localhost:8888/api/person/v1?direction=asc&page=0&size=10&sort=firstName,asc\""));
+		assertTrue(content.contains("rel: \"prev\"  href: \"http://localhost:8888/api/person/v1?direction=asc&page=2&size=10&sort=firstName,asc\""));
+		assertTrue(content.contains("rel: \"self\"  href: \"http://localhost:8888/api/person/v1?page=3&size=10&direction=asc\""));
+		assertTrue(content.contains("rel: \"next\"  href: \"http://localhost:8888/api/person/v1?direction=asc&page=4&size=10&sort=firstName,asc\""));
+		assertTrue(content.contains("rel: \"last\"  href: \"http://localhost:8888/api/person/v1?direction=asc&page=100&size=10&sort=firstName,asc\""));
+		
+		assertTrue(content.contains("page:  size: 10  totalElements: 1004  totalPages: 101  number: 3"));
 	}
 	
 	private void mockPerson() {

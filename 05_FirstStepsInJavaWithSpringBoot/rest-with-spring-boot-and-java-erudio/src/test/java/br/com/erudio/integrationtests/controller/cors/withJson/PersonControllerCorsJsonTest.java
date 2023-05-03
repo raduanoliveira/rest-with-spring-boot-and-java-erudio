@@ -2,6 +2,7 @@ package br.com.erudio.integrationtests.controller.cors.withJson;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -25,6 +26,7 @@ import br.com.erudio.data.vo.v1.security.TokenVO;
 import br.com.erudio.integrationtests.testcontainer.AbstractIntegrationTest;
 import br.com.erudio.integrationtests.vo.AccountCredentialsVO;
 import br.com.erudio.integrationtests.vo.PersonVO;
+import br.com.erudio.integrationtests.vo.wrappers.WrapperPersonVO;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.filter.log.LogDetail;
@@ -199,6 +201,7 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest{
 		var content = given().spec(specification)
 			.contentType(TestConfigs.CONTENT_TYPE_JSON)
 				.header(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
+				.queryParams("page",3,"size",10,"direction","asc")
 				.when()
 				.get()
 			.then()
@@ -207,7 +210,8 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest{
 				.body()
 				.asString();
 		
-		List<PersonVO> people = objectMapper.readValue(content, new TypeReference<List<PersonVO>>() {});
+		WrapperPersonVO wrapper = objectMapper.readValue(content, WrapperPersonVO.class);
+		var people = wrapper.getEmbedded().getPersons();
 		
 		PersonVO foundPersonOne = people.get(0);
 		
@@ -216,25 +220,27 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest{
 		assertNotNull(foundPersonOne.getLastName());
 		assertNotNull(foundPersonOne.getAddress());
 		assertNotNull(foundPersonOne.getGender());
-		assertEquals(3, foundPersonOne.getId());
+		assertEquals(673, foundPersonOne.getId());
 		
-		assertEquals("Leandro", foundPersonOne.getFirstName());
-		assertEquals("Almeida",foundPersonOne.getLastName());
-		assertEquals("Rua das Algarobas, 1000",foundPersonOne.getAddress());
-		assertEquals("Female",foundPersonOne.getGender());
+		assertEquals("Alic", foundPersonOne.getFirstName());
+		assertEquals("Terbrug",foundPersonOne.getLastName());
+		assertEquals("3 Eagle Crest Court",foundPersonOne.getAddress());
+		assertEquals("Male",foundPersonOne.getGender());
+		assertTrue(foundPersonOne.getEnabled());
 		
 		PersonVO foundPersonTwo = people.get(1);
-		
+		 
 		assertNotNull(foundPersonTwo.getId());
 		assertNotNull(foundPersonTwo.getFirstName());
 		assertNotNull(foundPersonTwo.getLastName());
 		assertNotNull(foundPersonTwo.getAddress());
 		assertNotNull(foundPersonTwo.getGender());
-		assertEquals(4, foundPersonTwo.getId());
+		assertEquals(410, foundPersonTwo.getId());
+		assertFalse(foundPersonTwo.getEnabled());
 		
-		assertEquals("Sabrina", foundPersonTwo.getFirstName());
-		assertEquals("Sato",foundPersonTwo.getLastName());
-		assertEquals("Rio de Janeiro",foundPersonTwo.getAddress());
+		assertEquals("Alie", foundPersonTwo.getFirstName());
+		assertEquals("Yeld",foundPersonTwo.getLastName());
+		assertEquals("42 Messerschmidt Crossing",foundPersonTwo.getAddress());
 		assertEquals("Female",foundPersonTwo.getGender());
 	}
 	
@@ -262,6 +268,7 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest{
 		person.setLastName("Piquet");
 		person.setAddress("Brasilia");
 		person.setGender("Male");
+		person.setEnabled(true);
 		
 	}
 
